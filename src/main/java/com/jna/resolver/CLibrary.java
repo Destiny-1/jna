@@ -26,6 +26,8 @@ public interface CLibrary extends Library {
 
     int do_read_proc(DataRecord.ByReference dataRecord, Pointer mess, Boolean flag);
 
-    int get_user_info(String userId, UserInfo.ByReference userInfo );
+    int get_user_info(String userId, UserInfo.ByReference userInfo);
 
+    int send_data(short destIp, short port, String userId, String data);
+//    int send_data(long destIp, short port, String userId, String data, int len);
 }

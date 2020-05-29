@@ -78,6 +78,16 @@ public class ClibHelper {
         System.out.println(userInfo.m_userid);
     }
 
+    public void send_data(){
+        CLibrary cLibrary = CLibrary.INSTANCE;
+        String _ip = "172.16.22.131";
+        short port = 6666;
+        String data = "sdasadsadsadas";
+        String dutId = "test123456";
+        long addr = FormatUtils.Ip2Int(_ip);
+        int index = cLibrary.send_data(port, port, dutId, data);
+        System.out.println(index);
+    }
 
     public int startGprsServer(int nServerPort) {
         CLibrary cLibrary = CLibrary.INSTANCE;
@@ -89,7 +99,7 @@ public class ClibHelper {
 
     public static void main(String[] args) {
         ClibHelper clibHelper = new ClibHelper();
-        System.out.println(clibHelper.stopNetService());
+//        clibHelper.send_data();
 //        clibHelper.doReadProc();
 //        clibHelper.setCustomIP("127.0.0.1");
 //        String data = "sdasadsadsadas";

@@ -1,5 +1,6 @@
 package com.jna.resolver;
 
+import com.jna.resolver.Utils.FormatUtils;
 import com.sun.jna.Memory;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.Platform;
@@ -66,8 +67,8 @@ public class CplusController {
     }
 
     @GetMapping("/SetCustomIP")
-    public void setCustomIP(@RequestParam(value = "ulIPAddr") int ulIPAddr) {
-        Long ipAddr = getUlong(ulIPAddr);
+    public void setCustomIP(@RequestParam(value = "ulIPAddr") String ulIPAddr) {
+        Long ipAddr = FormatUtils.Ip2Int(ulIPAddr);
         NativeLibrary instance = NativeLibrary.getInstance(libUrl);
         instance.getFunction("SetCustomIP").invoke(new Object[]{ipAddr});
         instance.dispose();
@@ -75,25 +76,31 @@ public class CplusController {
 
     @GetMapping("/do_send_user_data")
     public int doSendUserData(byte userid, byte data, short len, String mess) {
-        int userId = getUint8(userid);
-        int _data = getUint8(data);
-        int _len = getUint16(len);
         NativeLibrary instance = NativeLibrary.getInstance(libUrl);
-        int index = instance.getFunction("do_send_user_data").invokeInt(new Object[]{userId, _data, _len, mess});
+        int index = instance.getFunction("do_send_user_data").invokeInt(new Object[]{userid, data, len, mess});
         instance.dispose();
         return index;
     }
 
-    private int getUint8(byte s) {
-        return s & 0x00ff;
+    @GetMapping("/startServer")
+    public int startServer(@RequestParam(value = "nProtocol") int nProtocol, @RequestParam(value = "nServerPort") int nServerPort, @RequestParam(value = "nWorkMode") int nWorkMode){
+        System.out.println("nProtocol" + nProtocol);
+        System.out.println("nServerPort" + nServerPort);
+        System.out.println("nWorkMode" + nWorkMode);
+        NativeLibrary instance = NativeLibrary.getInstance(libUrl);
+        int index = instance.getFunction("SelectProtocol").invokeInt(new Object[]{nProtocol});
+        int index2 = instance.getFunction("SetWorkMode").invokeInt(new Object[]{nWorkMode});
+        Pointer mess = new Memory(512);
+        int index3 = instance.getFunction("start_gprs_server").invokeInt(new Object[]{nServerPort, mess});
+        byte[] byteArray = mess.getByteArray(0, 512);
+        System.out.println("----------------gprs info start-----------------------");
+        try {
+            System.out.println(new String(byteArray,"GB2312"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        System.out.println("----------------gprs info end-----------------------");
+        instance.dispose();
+        return 0;
     }
-
-    private int getUint16(short i) {
-        return i & 0x0000ffff;
-    }
-
-    private long getUlong(long i) {
-        return i & Long.MAX_VALUE;
-    }
-
 }
